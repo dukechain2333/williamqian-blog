@@ -1,0 +1,168 @@
+---
+title: 'Use Sklearn to Build Linear Regression Model'
+date: '2020-04-20'
+lastmod: '2021-02-01'
+tags: ['Machine Learning', 'Linear Regression']
+draft: false
+summary: 'A linear regression model is possibly the first machine-learning model that most people build using scikit-learn. Here is a really simple demo.'
+authors: ['default']
+---
+
+A linear regression model is possibly the first machine-learning model that most people build using scikit-learn. Here is a really simple demo.
+
+## Get Data
+
+Of course, we have to get data for our model. In the following passage, we are going to use the dataset provided by UCI to demonstrate the topic.
+
+Here is the description of our dataset: [Dataset Description](http://archive.ics.uci.edu/ml/datasets/Combined+Cycle+Power+Plant)
+
+And you can download the dataset here: [Download Dataset](http://archive.ics.uci.edu/ml/machine-learning-databases/00294/)
+
+The data is gathered from a combined cycle power plant, which has 9568 samples and 5 features: AT (Temperature), V (Exhaust Vacuum), AP (Ambient Pressure), RH (Relative Humidity), and EP (Net hourly electrical energy output).
+
+## Define Questions
+
+Our goal is quite simple here, we got a clear linear problem: EP is our output and the rest of the features are training features. Our model is going to be like this:
+
+$$
+EP=\theta_0+\theta_1 \times AT+\theta_2 \times V+\theta_3 \times AP+\theta_4 \times RH
+$$
+
+## Load Data
+
+> Usually, we need to pre-process the data, however, our data here has already been cleaned.
+
+Firstly, we need to import packages into the jupyter notebook (or directly into the `.py` file ).
+
+```python
+import matplotlib.pyplot as plt
+%matplotlib inline
+import numpy as np
+import pandas as pd
+from sklearn import datasets, linear_model, metrics
+```
+
+Then, we will use `pandas` to load data.
+
+```python
+data = pd.read_csv('data.csv')
+```
+
+Check the first 5 rows of the data.
+
+```python
+data.head()
+```
+
+|     |  AT   |   V   |   AP    |  RH   |   EP   |
+| :-: | :---: | :---: | :-----: | :---: | :----: |
+|  0  | 8.34  | 40.77 | 1010.84 | 90.01 | 480.48 |
+|  1  | 23.64 | 58.49 | 1011.40 | 74.20 | 445.75 |
+|  2  | 29.74 | 56.90 | 1007.15 | 41.91 | 438.76 |
+|  3  | 19.07 | 49.69 | 1007.22 | 76.79 | 453.09 |
+|  4  | 11.80 | 40.66 | 1017.13 | 97.20 | 464.43 |
+
+## Select Data
+
+We may check our data's shape first.
+
+```python
+data.shape
+```
+
+The result is `(9568,5)`, which means we have 9568 samples and 5 features. However, we only need 4 for our training sample, meaning that we need to select them separately.
+
+```python
+X = data[['AT', 'V', 'AP', 'RH']]
+X.head()
+```
+
+|     |  AT   |   V   |   AP    |  RH   |
+| :-: | :---: | :---: | :-----: | :---: |
+|  0  | 8.34  | 40.77 | 1010.84 | 90.01 |
+|  1  | 23.64 | 58.49 | 1011.40 | 74.20 |
+|  2  | 29.74 | 56.90 | 1007.15 | 41.91 |
+|  3  | 19.07 | 49.69 | 1007.22 | 76.79 |
+|  4  | 11.80 | 40.66 | 1017.13 | 97.20 |
+
+Then we select the `y` feature (EP).
+
+```python
+y = data[['EP']]
+y.head()
+```
+
+|     |   EP   |
+| :-: | :----: |
+|  0  | 480.48 |
+|  1  | 445.75 |
+|  2  | 438.76 |
+|  3  | 453.09 |
+|  4  | 464.43 |
+
+## Split the Training and Testing dataset
+
+The `train_test_split` function is a useful one to do the task.
+
+> The default train-test rate is 0.75:0.25
+
+```python
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+```
+
+## Use scikit-learn to Build Linear Model
+
+```python
+from sklearn.linear_model import LinearRegression
+linreg = LinearRegression()
+linreg.fit(X_train, y_train)
+```
+
+Now print the model coefficients.
+
+```python
+print(linreg.intercept_)
+print(linreg.coef_)
+```
+
+```
+[ 447.06297099]
+[[-1.97376045 -0.23229086  0.0693515  -0.15806957]]
+```
+
+So our model is going to be like this:
+
+$$
+EP=447.06297099-1.97376045 \times AT-0.23229086 \times V+0.0693515 \times AP-0.15806957 \times RH
+$$
+
+## Model Evaluation
+
+For a linear model, MSE (Mean Squared Error) and RMSE (Root Mean Squared Error) are usually used for evaluation.
+
+```python
+y_pred = linreg.predict(X_test)
+print("MSE:" + str(metrics.mean_squared_error(y_test, y_pred)))
+print("RMSE:" + str(np.sqrt(metrics.mean_squared_error(y_test, y_pred))))
+```
+
+```
+MSE: 20.0804012021
+RMSE: 4.48111606657
+```
+
+## Visualization
+
+This graph shows the relationship between the true and predicted values, with the points closer to the middle line y=x directly representing the lower predicted loss.
+
+```python
+fig, ax = plt.subplots()
+ax.scatter(y, predicted)
+ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
+ax.set_xlabel('Measured')
+ax.set_ylabel('Predicted')
+plt.show()
+```
+
+![img](https://raw.githubusercontent.com/dukechain2333/dukechain2333.github.io/main/assets/images/content-pics/content-pic-20200502.png)

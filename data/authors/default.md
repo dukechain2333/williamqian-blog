@@ -1,16 +1,16 @@
 ---
-name: Tails Azimuth
+name: William Qian
 avatar: /static/images/avatar.png
-occupation: Professor of Atmospheric Science
-company: Stanford University
-email: address@yoursite.com
-twitter: https://twitter.com/Twitter
-linkedin: https://www.linkedin.com
-github: https://github.com
+occupation: M.S. in Biostatistics, Graduate Student
+company: Brown University
+email: william.z.qian@gmail.com
+twitter: https://twitter.com/william_z_qian
+linkedin: https://www.linkedin.com/in/william-qian-3a97b5245/
+github: https://github.com/dukechain2333
 ---
 
-Tails Azimuth is a professor of atmospheric sciences at the Stanford AI Lab. His research interests includes complexity modelling of tailwinds, headwinds and crosswinds.
+William Qian is a graduate student of Biostatistics at Brown University. He studied Data Science in undergraduate studies, and he believes that his skills can be helpful in public health.
 
-He leads the clean energy group which develops 3D air pollution-climate models, writes differential equation solvers, and manufactures titanium plated air ballons. In his free time he bakes raspberry pi.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.
+Although Mr. Qian is now studying Biostatistics, he spends a lot of time on programming. He is very interested in developing applications and training deep learning models.
+Please don't forget that this man spent 4 years time on studying Data Science, which is a subject that requires a lot of programming and statistic skills.
+After several years of study, programming has already became part of his life, and also became one of his hobbies.
