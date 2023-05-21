@@ -9,7 +9,7 @@ linkedin: https://www.linkedin.com/in/william-qian-3a97b5245/
 github: https://github.com/dukechain2333
 ---
 
-William Qian is a graduate student of Biostatistics at Brown University. He studied Data Science in undergraduate studies, and he believes that his skills can be helpful in public health.
+William Qian is a graduate student of Biostatistics at Brown University. He studied Data Science as an undergraduate and believes his skills could be beneficial in public health.
 
 Although Mr. Qian is now studying Biostatistics, he spends a lot of time on programming. He is very interested in developing applications and training deep learning models.
 Please don't forget that this man spent 4 years time on studying Data Science, which is a subject that requires a lot of programming and statistic skills.
