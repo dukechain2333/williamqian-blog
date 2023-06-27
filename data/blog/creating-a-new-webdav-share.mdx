@@ -1,0 +1,122 @@
+---
+title: 快速创建一个新的WebDav分享
+date: '2023-06-27'
+tags: ['Linux', 'WebDav', 'NAS']
+draft: false
+summary: '快速建立一个新的WebDav分享'
+---
+
+# 快速创建一个新的 WebDav 分享
+
+## 创建目录
+
+```bash
+sudo mkdir /var/www/html/newDir
+```
+
+## 设置文件权限
+
+```bash
+sudo chown www-data:www-data /var/www/html/newDir
+sudo chmod 755 /var/www/html/newDir
+```
+
+## 配置 WebDav
+
+在 WebDav 的配置文件中添加新的配置
+
+```bash
+sudo vim /etc/apache2/sites-available/000-default.conf
+```
+
+### 公共分享（无用户名和密码）
+
+```xml
+<Directory /var/www/html/newDir>
+    Options Indexes FollowSymLinks
+    DAV On
+</Directory>
+```
+
+### 不加密密码分享
+
+创建新的用户
+
+```bash
+sudo htpasswd -c /etc/apache2/webdav.password username
+```
+
+在 WebDav 的配置文件中添加新的配置
+
+```xml
+<Directory /var/www/html/newDir>
+    Options Indexes FollowSymLinks
+    DAV On
+    AuthType Basic
+    AuthName "webdav"
+    AuthUserFile /etc/apache2/webdav.password
+    Require valid-user
+</Directory>
+```
+
+这是一个 Apache 配置文件中的 `<Directory>` 段落，定义了特定目录的配置选项。以下是配置中每个参数的含义：
+
+- `<Directory /var/www/html/newDir>`: 这一行告诉 Apache 这个配置段落将应用于路径 `/var/www/html/newDir` 下的目录。
+
+- `Options Indexes`: 这是一个 Apache 选项，允许 Apache 在没有默认索引文件（如 `index.html` 或 `index.php`）的情况下，生成并显示一个目录的文件列表。
+
+- `DAV On`: 这一行启用了 WebDAV（Web-based Distributed Authoring and Versioning）的支持。WebDAV 是一个扩展了 HTTP 的协议，支持用户通过 web 服务器对文件进行读写。
+
+- `AuthType Basic`: 这一行指定了 Apache 将使用基础的 HTTP 认证。在基础认证中，用户提供的用户名和密码会以非加密的形式发送到服务器。
+
+- `AuthName "webdav"`: 这一行设置了当用户被请求输入他们的认证信息时显示的认证领域的名称。在大多数浏览器中，这会以弹窗的形式显示给用户。
+
+- `AuthUserFile /etc/apache2/webdav.password`: 这一行告诉 Apache 认证信息（用户名和密码）存储在哪个文件中。在这个例子中，该文件是 `/etc/apache2/webdav.password`。
+
+- `Require valid-user`: 这一行说明只有在 `AuthUserFile` 指定的文件中存在的用户才能访问这个目录。在这个例子中，只有 `/etc/apache2/webdav.password` 文件中列出的用户才可以访问 `/var/www/html/newDir` 目录。
+
+- `</Directory>`: 这一行标记了 `<Directory>` 配置段落的结束。所有在 `<Directory>` 和 `</Directory>` 之间的配置选项都只会应用于该段落中指定的目录。
+
+这个配置为 `/var/www/html/newDir` 目录启用了 WebDAV，并且只允许在 `/etc/apache2/webdav.password` 文件中存在的用户访问这个目录。
+
+### 加密密码分享（摘要认证）
+
+首先需要启用摘要认证
+
+```bash
+sudo a2enmod auth_digest
+```
+
+然后你需要创建一个包含用户信息的密码文件。和基本认证不同，摘要认证的密码文件不能通过`htpasswd`命令来创建，你需要使用`htdigest`命令。下面是一个例子，它创建了一个名为`webdav.password`的密码文件，一个领域为`webdav`的用户，用户名为`username`：
+
+> _什么是领域：_ 在 Apache 摘要认证中，"领域"（Realm）是用来描述受保护资源的字符串。当你尝试访问受保护的资源时，这个字符串将显示在弹出的认证对话框中，告诉用户他们正在尝试访问的是什么。当用户尝试访问与此领域相关联的受保护资源时，他们会在弹出的认证对话框中看到 "webdav"，并被要求输入用户名和密码。
+
+```bash
+sudo htdigest -c /etc/apache2/webdav.password webdav username
+```
+
+在 WebDav 的配置文件中添加新的配置
+
+```xml
+<Directory /var/www/html/newDir>
+    Options Indexes FollowSymLinks
+    DAV On
+    AuthType Digest
+    AuthName "webdav"
+    AuthDigestProvider file
+    AuthUserFile /etc/apache2/webdav.password
+    Require valid-user
+</Directory>
+```
+
+> 在 Apache 中，FollowSymLinks 和 SymLinksIfOwnerMatch 是 Options 指令的参数，用于控制 Apache 如何处理符号链接。如果两者都没有开启，Apache 会阻止 RewriteRule 指令的执行，因为它可以绕过目录权限。在这里我们全部设置了 FollowSymLinks，注意这可能有安全隐患，因为 FollowSymLinks 选项允许 Apache 访问到符号链接所指向的目录，这可能导致 Apache 可以访问到本不应该被访问的目录。你应该确保只有可信的用户可以在这些目录中创建符号链接。如果你不能保证这一点，你可能需要使用 SymLinksIfOwnerMatch 选项，它只允许 Apache 访问所有者相同的符号链接和目标文件。
+
+## 重启 WebDav
+
+```bash
+sudo systemctl restart apache2
+```
+
+## 访问资源
+
+通过`http://server_address/newDir`来访问设置好的 WebDav。
